@@ -1,6 +1,6 @@
-# Enhanced_RRSIS_UOT: Enhanced Referring Remote Sensing Image Segmentation with Unbalanced Optimal Transport
+# Enhanced_RRSIS_OT: Enhanced Referring Remote Sensing Image Segmentation with Optimal Transport
 
-**Enhanced_RRSIS_UOT** extends **RRSIS_SAM3** with **4+1 novel techniques** for improved performance on referring remote sensing image segmentation, targeting **82–83% mIoU** on RRSIS-D.
+**Enhanced_RRSIS_OT** extends **RRSIS_SAM3** with **4+1 novel techniques** for improved performance on referring remote sensing image segmentation, targeting **82–83% mIoU** on RRSIS-D.
 
 ---
 
@@ -19,86 +19,7 @@
 
 ## Architecture
 
-![Enhanced RRSIS-UOT Architecture](Final_RRSIS_Architecture.jpeg)
-
-### System Architecture Flow (Mermaid Diagram)
-
-```mermaid
-graph TD
-    classDef input fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff
-    classDef encoder fill:#2b6cb0,stroke:#2c5282,stroke-width:2px,color:#fff
-    classDef alignment fill:#805ad5,stroke:#553c9a,stroke-width:2px,color:#fff
-    classDef prompt fill:#38a169,stroke:#22543d,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
-    classDef fusion fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff
-    classDef decoder fill:#c53030,stroke:#742a2a,stroke-width:2px,color:#fff
-    classDef output fill:#d69e2e,stroke:#975a16,stroke-width:2px,color:#fff
-
-    subgraph Inputs
-        I["Image (B,3,504,504)"]:::input
-        C["Text Caption (List str)"]:::input
-    end
-
-    subgraph Feature_Extraction
-        VE["Text Encoder<br/>(seq,B,256)"]:::encoder
-        LoRA["Dynamic LoRA Manager<br/>pooled text → scale vectors"]:::encoder
-        ViT["SAM3 ViT Backbone + FPN<br/>List (B,256,H_i,W_i)"]:::encoder
-    end
-
-    subgraph Cross_Modal_Alignment
-        OT["MultiScale OT Aligner<br/>FP32-safe Sinkhorn"]:::alignment
-        OT_Map["Transport Plan P<br/>(B, HW, seq)"]:::alignment
-        SCL["SCL Loss<br/>MSE(P^T·S_img·P, S_txt)"]:::alignment
-        Enh_Vis["OT-Enhanced FPN Features"]:::alignment
-    end
-
-    subgraph Grounding_Aware_Prompts
-        GPG["GPG Prompt Generator"]:::prompt
-        SAP["Scale-Aware Prompting<br/>tiny → 1pt, large → 5pts"]:::prompt
-        Pts["Sparse Points (B,K,2)"]:::prompt
-    end
-    
-    subgraph SAM3_Core
-        PE["Geometry Encoder"]:::prompt
-        TransEnc["Transformer Encoder<br/>Fusion: Vision + Text + Prompts"]:::fusion
-        TransDec["Transformer Decoder<br/>N=3 Query Hypotheses"]:::decoder
-    end
-
-    subgraph Output_and_Loss
-        SegHead["Segmentation Head<br/>pred_masks (B,N,H,W)"]:::decoder
-        Select["Best Mask Selection<br/>IoU-based Score Ranking"]:::output
-        Mask["Final Mask (B,1,504,504)"]:::output
-        Loss["OHEM + FocalDice + Boundary<br/>+ 0.1×Contrastive + 0.1×SCL"]:::output
-    end
-
-    I --> ViT
-    C --> VE
-    
-    VE --> LoRA
-    LoRA -.->|"Text-Conditioned Weights"| ViT
-    
-    VE --> OT
-    ViT --> OT
-    OT --> OT_Map
-    OT --> Enh_Vis
-    OT --> SCL
-    
-    OT_Map --> GPG
-    GPG --> SAP
-    SAP --> Pts
-    
-    Pts ==>|"Inject Points"| PE
-    PE --> TransEnc
-    
-    Enh_Vis ==> TransEnc
-    VE ==> TransEnc
-    
-    TransEnc ==>|"Encoder Hidden States"| TransDec
-    TransDec --> SegHead
-    SegHead --> Select
-    Select --> Mask
-    Mask --> Loss
-    SCL --> Loss
-```
+![Enhanced RRSIS-OT Architecture](Final_RRSIS_Architecture.jpeg)
 
 ### Data Flow Summary
 
@@ -122,7 +43,7 @@ Image (B,3,504,504) + Caption (List[str])
 
 ## Key Differences from RRSIS_SAM3
 
-| Feature | RRSIS_SAM3 | Enhanced_RRSIS_UOT |
+| Feature | RRSIS_SAM3 | Enhanced_RRSIS_OT |
 |---------|------------|---------------------|
 | LoRA Type | Static (same weights for all inputs) | **Dynamic** (text-conditioned per-caption) |
 | OT Alignment | Single-scale, one pass | **Multi-scale** across all FPN levels |
@@ -162,7 +83,7 @@ These critical bugs from v1 have been fixed in this release:
 ## Project Structure
 
 ```
-Enhanced_RRSIS_UOT/
+Enhanced_RRSIS_OT/
 ├── sam3/                           # SAM3 core implementation
 ├── configs/
 │   ├── enhanced_rrsis_uot.yaml     # Full configuration for enhanced model
@@ -310,21 +231,22 @@ python test.py \
       --fp16
 ```
 
-### Expected Output Format
+### Output 
 
 ```
 ============================================================
-  Results on rrsis_d (test)
+Results on rrsis_d (test)
+Caption Eval Mode: first
 ============================================================
-  mIoU:  82.35%
-  oIoU:  83.12%
-  P@0.5: 91.23%
-  P@0.6: 87.45%
-  P@0.7: 82.10%
-  P@0.8: 72.34%
-  P@0.9: 45.67%
+  mIoU:  70.51%
+  oIoU:  80.24%
+  P@0.5: 82.36%
+  P@0.6: 77.10%
+  P@0.7: 66.82%
+  P@0.8: 50.59%
+  P@0.9: 31.08%
   Samples: 3481
-  Avg Time: 45.2ms
+  Avg Time: 268.9ms
 ============================================================
 ```
 
@@ -378,8 +300,8 @@ python test.py \
 ## Citation
 
 ```bibtex
-@article{enhanced_rrsis_uot_2026,
-    title={Enhanced RRSIS-UOT: Enhanced Referring Remote Sensing Image Segmentation with Unbalanced Optimal Transport},
+@article{enhanced_rrsis_ot_2026,
+    title={Enhanced RRSIS-OT: Enhanced Referring Remote Sensing Image Segmentation with Optimal Transport},
     year={2026}
 }
 ```
