@@ -16,23 +16,6 @@
 ## Architecture!
 [Uploading image.png…]()
 
-### Data Flow Summary
-
-```
-Image (B,3,504,504) + Caption (List[str])
-  ├─ Step 0:   Normalize → [-1, 1]
-  ├─ Step 1:   Text Encoder → language_features (seq, B, 256)
-  ├─ Step 1.5: Dynamic LoRA → cache pooled text (B, 256) in all LoRA layers
-  ├─ Step 1.8: ViT + LoRA → backbone_fpn: List[(B, 256, H_i, W_i)]
-  ├─ Step 2:   Multi-Scale OT → aligned FPN + transport plan P (B, HW, seq)
-  ├─ Step 3:   GPG + SAP → sparse points (B, K, 2)
-  ├─ Step 4:   Encode Prompt → prompt tokens
-  ├─ Step 5:   Transformer Encoder → fused hidden states
-  ├─ Step 6:   DETR Decoder → N=3 mask hypotheses
-  ├─ Step 7:   Segmentation Head → pred_masks (B, N, H, W)
-  ├─ Step 8:   Best Mask Selection → (B, 1, 504, 504)  [IoU-based ranking]
-  └─ Step 10:  Loss = SegLoss + 0.1 × Contrastive + 0.1 × SCL
-```
 
 ## Key Differences from RRSIS_SAM3
 
