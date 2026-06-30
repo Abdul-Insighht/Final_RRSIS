@@ -1,27 +1,48 @@
-# Enhanced_RRSIS_OT: Enhanced Referring Remote Sensing Image Segmentation with Optimal Transport
+# GeoSegAI & Enhanced RRSIS-OT: Unified Platform for Referring Remote Sensing Image Segmentation
 
-**Enhanced_RRSIS_OT** extends **RRSIS_SAM3** with **4+1 novel techniques** for improved performance on referring remote sensing image segmentation, targeting **82–83% mIoU** on RRSIS-D.
-
----
-
-## What's New (Over RRSIS_SAM3)
-
-| Enhancement | Module | Description |
-|-------------|--------|-------------|
-| 🟢 **Text-Guided Dynamic LoRA** | [dynamic_lora.py](file:///d:/FYPPP/ahmadnoidea/lib/dynamic_lora.py) | Text-conditioned vision adapter weights — vision encoder adapts per-caption |
-| 🟢 **Multi-Scale OT Alignment** | [multiscale_ot_alignment.py](file:///d:/FYPPP/ahmadnoidea/lib/multiscale_ot_alignment.py) | Scale-aware OT alignment across all FPN levels with gated residual fusion |
-| 🟢 **OHEM + Focal + Boundary Loss** | [ohem_loss.py](file:///d:/FYPPP/ahmadnoidea/lib/ohem_loss.py) | Hard pixel mining + focal weighting + boundary-aware supervision |
-| 🟢 **Contrastive Loss (InfoNCE)** | [contrastive_loss.py](file:///d:/FYPPP/ahmadnoidea/lib/contrastive_loss.py) | Auxiliary loss aligning masked visual features with text features |
-| 🟢 **Grounding-Aware Prompt Generator** | [prompt_generator.py](file:///d:/FYPPP/ahmadnoidea/lib/prompt_generator.py) | Extracts point-based geometric prompts from OT transport plans |
-| 🟢 **Scale-Aware Prompting (SAP)** | [prompt_generator.py](file:///d:/FYPPP/ahmadnoidea/lib/prompt_generator.py) | Dynamically adapts point counts based on object scale to suppress noise |
+Welcome to **GeoSegAI & Enhanced RRSIS-OT**, a complete mono-repository comprising:
+1. **The Core ML Research Pipeline (Root)**: A state-of-the-art referring remote sensing image segmentation (RRSIS) research framework extending SAM3 with 4+1 novel techniques (Dynamic LoRA, Multi-Scale OT, OHEM, Contrastive Loss, GPG, and SAP) targeting **82–83% mIoU** on the RRSIS-D dataset.
+2. **The Web Application (`RRSIS-WebApp/`)**: An interactive, production-ready GIS platform featuring a modern **React client**, a lazy-loading **Flask inference API** hosting the trained PyTorch checkpoints, and a **Firebase Firestore backend** with user credit management, project states, and real-time dashboard notifications.
 
 ---
 
-## Architecture
+## 🏛️ System Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   React Client (Vite)                   │
+│  - Modern Dashboard Page & Interactive Segmentation UI   │
+│  - Real-time Firestore SDK & Credit Management          │
+└────────────────────────────┬────────────────────────────┘
+                             │ REST / JSON API
+                             ▼
+┌─────────────────────────────────────────────────────────┐
+│                    Flask API Backend                    │
+│  - Dynamic model routing & lazy-loading registry        │
+│  - Token verification, secure file uploads, & CORS      │
+└────────────────────────────┬────────────────────────────┘
+                             │ Local PyTorch Pipeline
+                             ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Deep Learning Models                   │
+│  - CADFormer Swin-Base + BERT tokenizer                 │
+│  - RS-OT-SAM3 + SAM3 ViT Backbone + Dynamic LoRA        │
+└─────────────────────────────────────────────────────────┘
+```
+
+The system features complete end-to-end integration:
+* **Frontend**: React + TailwindCSS + Vite + Firebase Client SDK.
+* **Backend**: Flask API executing local PyTorch inference pipelines on CPU or CUDA-accelerated hardware.
+* **Core Models**: CADFormer (visual-textual fusion) and RS-OT-SAM3 (Optimal Transport boundaries + Segment Anything 3).
+* **Database & Auth**: Google Firebase (Authentication & Firestore NoSQL) for secure user sessions, credit reservation, and project management.
+
+---
+
+## 🧠 Deep Learning Architecture & Data Flow
 
 ![Enhanced RRSIS-OT Architecture](Final_RRSIS_Architecture.jpeg)
 
-### Data Flow Summary
+### Model Data Flow Summary
 
 ```
 Image (B,3,504,504) + Caption (List[str])
@@ -29,19 +50,30 @@ Image (B,3,504,504) + Caption (List[str])
   ├─ Step 1:   Text Encoder → language_features (seq, B, 256)
   ├─ Step 1.5: Dynamic LoRA → cache pooled text (B, 256) in all LoRA layers
   ├─ Step 1.8: ViT + LoRA → backbone_fpn: List[(B, 256, H_i, W_i)]
-  ├─ Step 2:   Multi-Scale OT → aligned FPN + transport plan P (B, HW, seq)
+  ├─ Step 2:   Multi-Scale OT → Aligned FPN + transport plan P (B, HW, seq)
   ├─ Step 3:   GPG + SAP → sparse points (B, K, 2)
   ├─ Step 4:   Encode Prompt → prompt tokens
   ├─ Step 5:   Transformer Encoder → fused hidden states
   ├─ Step 6:   DETR Decoder → N=3 mask hypotheses
   ├─ Step 7:   Segmentation Head → pred_masks (B, N, H, W)
-  ├─ Step 8:   Best Mask Selection → (B, 1, 504, 504)  [IoU-based ranking]
+  ├─ Step 8:   Best Mask Selection → (B, 1, 504, 504) [IoU-based ranking]
   └─ Step 10:  Loss = SegLoss + 0.1 × Contrastive + 0.1 × SCL
 ```
 
 ---
 
-## Key Differences from RRSIS_SAM3
+## ✨ Novel Core Enhancements (Over RRSIS_SAM3)
+
+| Enhancement | Module | Description |
+|-------------|--------|-------------|
+| 🟢 **Text-Guided Dynamic LoRA** | [dynamic_lora.py](file:///d:/FYPPP/Final_RRSIS/lib/dynamic_lora.py) | Text-conditioned vision adapter weights — vision encoder adapts per-caption |
+| 🟢 **Multi-Scale OT Alignment** | [multiscale_ot_alignment.py](file:///d:/FYPPP/Final_RRSIS/lib/multiscale_ot_alignment.py) | Scale-aware OT alignment across all FPN levels with gated residual fusion |
+| 🟢 **OHEM + Focal + Boundary Loss** | [ohem_loss.py](file:///d:/FYPPP/Final_RRSIS/lib/ohem_loss.py) | Hard pixel mining + focal weighting + boundary-aware supervision |
+| 🟢 **Contrastive Loss (InfoNCE)** | [contrastive_loss.py](file:///d:/FYPPP/Final_RRSIS/lib/contrastive_loss.py) | Auxiliary loss aligning masked visual features with text features |
+| 🟢 **Grounding-Aware Prompt Generator** | [prompt_generator.py](file:///d:/FYPPP/Final_RRSIS/lib/prompt_generator.py) | Extracts point-based geometric prompts from OT transport plans |
+| 🟢 **Scale-Aware Prompting (SAP)** | [prompt_generator.py](file:///d:/FYPPP/Final_RRSIS/lib/prompt_generator.py) | Dynamically adapts point counts based on object scale to suppress noise |
+
+### Key Differences from RRSIS_SAM3
 
 | Feature | RRSIS_SAM3 | Enhanced_RRSIS_OT |
 |---------|------------|---------------------|
@@ -56,35 +88,11 @@ Image (B,3,504,504) + Caption (List[str])
 
 ---
 
-## Bug Fixes Applied (v2)
-
-These critical bugs from v1 have been fixed in this release:
-
-| Bug | Severity | Fix |
-|-----|----------|-----|
-| **Sinkhorn FP16 underflow** → NaN crash | 🔴 Critical | Force FP32 + `autocast(enabled=False)` inside Sinkhorn |
-| **Score supervision** → all queries trained to 1/N | 🟠 High | IoU-based matching: best query → 1.0, others → 0.0 |
-| **Contrastive loss** → constant spatial map | 🟡 Medium | Use real FPN features instead of pooled+expanded |
-| **SCL weight** → hardcoded 0.1 | 🟢 Low | Configurable `scl_weight` parameter |
-| **Deprecated APIs** → PyTorch warnings | 🟢 Low | Updated `torch.amp.GradScaler` and `torch.amp.autocast` |
-
----
-
-## Supported Datasets
-
-| Dataset | Train | Val | Test | Image Size | Categories | Reference |
-|---------|-------|-----|------|------------|------------|-----------|
-| **RRSIS-D** | 12,181 | 1,740 | 3,481 | 800×800 | 20 | DIOR-RSVG |
-| **RRSIS-HR** | 2,118 | 268 | 264 | 1024×1024 | 7 | High-Res |
-| **RefSegRS** | 2,172 | 413 | 1,817 | 512×512 | — | Original RS |
-
----
-
-## Project Structure
+## 📂 Project Directory Structure
 
 ```
-Enhanced_RRSIS_OT/
-├── sam3/                           # SAM3 core implementation
+Final_RRSIS/
+├── sam3/                           # SAM3 core training/inference implementation
 ├── configs/
 │   ├── enhanced_rrsis_uot.yaml     # Full configuration for enhanced model
 │   └── rrsis_sam3.yaml             # Baseline configuration
@@ -112,147 +120,209 @@ Enhanced_RRSIS_OT/
 ├── test_forward_pass.py            # Quick sanity test script to verify model forward pass
 ├── transforms.py                   # Target-aware augmentations and resize utilities
 ├── utils.py                        # Common training helper utilities
-├── requirements.txt                # Project dependency packages
+├── requirements.txt                # ML Model Training dependency packages
 ├── fine.sh                         # Optimized training shell script
-└── test.sh                         # Evaluation shell script
+├── test.sh                         # Evaluation shell script
+│
+├── RRSIS-WebApp/                   # 🖥️ Interactive Web Application
+│   ├── backend/                    # Flask REST API Backend
+│   │   ├── app.py                  # Main server entry point & Firestore auto-sync
+│   │   ├── config.py               # Flask environment configurations
+│   │   ├── models/                 # Copied Model Source Code for inference (excl. .git)
+│   │   │   └── rsotsam3/           # RS-OT-SAM3 network modules (including sam3/ and lib/)
+│   │   ├── weights/                # Checkpoints (Excluded from Git / Must be placed manually)
+│   │   │   ├── cadformer/          # CADFormer weight checkpoints
+│   │   │   │   ├── bert/           # Local BERT tokenizer weights/config (Tracked)
+│   │   │   │   └── model_best_RMSIN.pth # Swin-BERT Checkpoint (2.8 GB)
+│   │   │   └── RS-OT-SAM3/         # RS-OT-SAM3 weight checkpoints
+│   │   │       ├── sam3.pt         # Base SAM3 checkpoint (3.4 GB)
+│   │   │       └── best_model.pth  # Fine-tuned checkpoint (3.7 GB)
+│   │   ├── routes/                 # API route blueprints (admin, payments, segmentation)
+│   │   ├── services/               # Core business services (Auth, Credit, Model Registry)
+│   │   ├── uploads/                # Local directory serving uploaded images/masks
+│   │   └── requirements.txt        # Flask Backend dependencies (incl. firebase-admin)
+│   ├── src/                        # React Client Source Code
+│   │   ├── components/             # Reusable UI widgets & modal templates
+│   │   ├── context/                # React Context Providers (Auth, Admin State)
+│   │   ├── firebase/               # Firestore SDK queries & database configurations
+│   │   ├── layouts/                # UI wrappers & Sidebar structures
+│   │   └── pages/                  # Screen views (Dashboards, Results, Model Admin)
+│   ├── public/                     # Frontend static assets (icons, images)
+│   ├── firestore.rules             # Database access control rules
+│   ├── package.json                # Frontend Node.js dependencies
+│   ├── tailwind.config.js          # Tailwind theme configurations
+│   └── vite.config.js              # Vite compiler configuration
 ```
 
 ---
 
-## Training
+## 🚀 Setup & Execution Guide
 
-### 🏆 Recommended Training Command (Best Performance)
+### Part A: Machine Learning Pipeline (Model Training & Evaluation)
 
-Optimized hyperparameters for **RRSIS-D** (16GB+ VRAM):
-
+Ensure you install python packages from the root `requirements.txt`:
 ```bash
-env MPLBACKEND="agg" WANDB_MODE=disabled python train.py \
-      --dataset rrsis_d \
-      --data_root ./data/ \
-      --sam3_ckpt ./pre-trained-weights/sam3.pt \
-      --output_dir ./output/rrsis_d_enhanced_v2 \
-      --image_size 504 \
-      --lora_rank 16 \
-      --lora_alpha 32.0 \
-      --epochs 40 \
-      --batch_size 2 \
-      --grad_accum_steps 8 \
-      --lr 5e-5 \
-      --lr_backbone 1e-5 \
-      --lr_decoder 5e-5 \
-      --weight_decay 0.01 \
-      --warmup_epochs 5 \
-      --contrastive_weight 0.1 \
-      --ohem_hard_ratio 0.3 \
-      --ot_reg 0.1 \
-      --ot_num_iter 10 \
-      --num_ot_scales 3 \
-      --boundary_loss_weight 0.5 \
-      --focal_gamma 2.0 \
-      --fp16 \
-      --gradient_checkpointing \
-      --seed 42 \
-      --num_workers 4 \
-      --use_dynamic_lora \
-      --use_contrastive_loss \
-      --use_multiscale_ot \
-      --use_ohem_loss
+pip install -r requirements.txt
 ```
 
-Or run via the optimized launcher script:
-```bash
-bash fine.sh rrsis_d ./data ./pre-trained-weights/sam3.pt
-```
+#### 📊 Supported Datasets
+| Dataset | Train | Val | Test | Image Size | Categories | Reference |
+|---------|-------|-----|------|------------|------------|-----------|
+| **RRSIS-D** | 12,181 | 1,740 | 3,481 | 800×800 | 20 | DIOR-RSVG |
+| **RRSIS-HR** | 2,118 | 268 | 264 | 1024×1024 | 7 | High-Res |
+| **RefSegRS** | 2,172 | 413 | 1,817 | 512×512 | — | Original RS |
 
-### ⚡ Quick Training (Ablation / Dev Run)
+#### 1. Training Commands
+* **🏆 Recommended Hyperparameters (Best Performance)**:
+  ```bash
+  env MPLBACKEND="agg" WANDB_MODE=disabled python train.py \
+        --dataset rrsis_d \
+        --data_root ./data/ \
+        --sam3_ckpt ./pre-trained-weights/sam3.pt \
+        --output_dir ./output/rrsis_d_enhanced_v2 \
+        --image_size 504 \
+        --lora_rank 16 \
+        --lora_alpha 32.0 \
+        --epochs 40 \
+        --batch_size 2 \
+        --grad_accum_steps 8 \
+        --lr 5e-5 \
+        --lr_backbone 1e-5 \
+        --lr_decoder 5e-5 \
+        --weight_decay 0.01 \
+        --warmup_epochs 5 \
+        --contrastive_weight 0.1 \
+        --scl_weight 0.1 \
+        --ohem_hard_ratio 0.3 \
+        --ot_reg 0.1 \
+        --ot_num_iter 10 \
+        --num_ot_scales 3 \
+        --boundary_loss_weight 0.5 \
+        --focal_gamma 2.0 \
+        --fp16 \
+        --gradient_checkpointing \
+        --seed 42 \
+        --num_workers 4 \
+        --use_dynamic_lora \
+        --use_contrastive_loss \
+        --use_multiscale_ot \
+        --use_ohem_loss
+  ```
+  Or run via the optimized launcher script:
+  ```bash
+  bash fine.sh rrsis_d ./data ./pre-trained-weights/sam3.pt
+  ```
 
-```bash
-env MPLBACKEND="agg" python train.py \
-      --dataset rrsis_d \
-      --data_root ./data/ \
-      --sam3_ckpt ./pre-trained-weights/sam3.pt \
-      --output_dir ./output/quick_run \
-      --epochs 25 \
-      --batch_size 2 \
-      --grad_accum_steps 4 \
-      --lr 5e-5 \
-      --ohem_hard_ratio 0.25 \
-      --fp16 \
-      --gradient_checkpointing
-```
+* **⚡ Quick Training (Ablation / Dev Run)**:
+  ```bash
+  env MPLBACKEND="agg" python train.py \
+        --dataset rrsis_d \
+        --data_root ./data/ \
+        --sam3_ckpt ./pre-trained-weights/sam3.pt \
+        --output_dir ./output/quick_run \
+        --epochs 25 \
+        --batch_size 2 \
+        --grad_accum_steps 4 \
+        --lr 5e-5 \
+        --ohem_hard_ratio 0.25 \
+        --fp16 \
+        --gradient_checkpointing
+  ```
 
-### 🔬 Ablation Studies
-
-Toggle individual enhancements using the override flags:
-
-```bash
-# Baseline (equivalent to RRSIS_SAM3):
-python train.py --dataset rrsis_d --data_root ./data/ --sam3_ckpt ./pre-trained-weights/sam3.pt \
-    --no_dynamic_lora --no_contrastive_loss --no_multiscale_ot --no_ohem_loss
-
-# Only Dynamic LoRA:
-python train.py --dataset rrsis_d --data_root ./data/ --sam3_ckpt ./pre-trained-weights/sam3.pt \
-    --no_contrastive_loss --no_multiscale_ot --no_ohem_loss
-
-# Only OHEM Loss:
-python train.py --dataset rrsis_d --data_root ./data/ --sam3_ckpt ./pre-trained-weights/sam3.pt \
-    --no_dynamic_lora --no_contrastive_loss --no_multiscale_ot
-```
+#### 2. Evaluation Commands
+* **Full Evaluation on Test Set**:
+  ```bash
+  python test.py \
+        --dataset rrsis_d \
+        --data_root ./data/ \
+        --sam3_ckpt ./pre-trained-weights/sam3.pt \
+        --split test \
+        --resume ./output/rrsis_d_enhanced_v2/best_model.pth \
+        --fp16
+  ```
+  Or run via the evaluation script:
+  ```bash
+  bash test.sh rrsis_d test ./output/rrsis_d_enhanced_uot/best_model.pth
+  ```
 
 ---
 
-## Evaluation
+### Part B: Web Application Setup (GeoSegAI Frontend + Backend)
 
-### Full Evaluation on Test Set
-
+Navigate to the `RRSIS-WebApp` folder:
 ```bash
-python test.py \
-      --dataset rrsis_d \
-      --data_root ./data/ \
-      --sam3_ckpt ./pre-trained-weights/sam3.pt \
-      --split test \
-      --resume ./output/rrsis_d_enhanced_v2/best_model.pth \
-      --fp16
+cd RRSIS-WebApp
 ```
 
-Or run via the evaluation script:
-```bash
-bash test.sh rrsis_d test ./output/rrsis_d_enhanced_uot/best_model.pth
-```
+#### 1. Backend Setup (Flask API)
+1. **Prepare Virtual Environment**:
+   ```bash
+   cd backend
+   python -m venv .venv
+   # Activate (Windows):
+   .venv\Scripts\activate
+   # Activate (Linux/macOS):
+   source .venv/bin/activate
+   ```
+2. **Install Dependencies**:
+   * **For GPU Support (CUDA 12.1)**:
+     ```bash
+     pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+     pip install -r requirements.txt
+     ```
+   * **For CPU-Only Execution**:
+     ```bash
+     pip install torch torchvision
+     pip install -r requirements.txt
+     ```
+3. **Place Pre-trained Weights**:
+   Create the required weights directories and place your model files (excluded from git):
+   * Create `backend/weights/cadformer/` and place:
+     - `model_best_RMSIN.pth` (2.8 GB Swin-BERT Checkpoint)
+     - `swin_base_patch4_window12_384_22k.pth` (450 MB Swin Backbone Checkpoint)
+   * Create `backend/weights/RS-OT-SAM3/` and place:
+     - `sam3.pt` (3.4 GB base SAM3 Checkpoint)
+     - `best_model.pth` (3.7 GB fine-tuned checkpoint)
+4. **Firebase Admin Credentials**:
+   * Obtain the Private Key Admin JSON from your Google Firebase console.
+   * Save it as `serviceAccountKey.json` directly under `RRSIS-WebApp/backend/`.
+5. **Run the Server**:
+   ```bash
+   python app.py
+   ```
+   The backend server starts on `http://localhost:5000`.
 
-### Evaluation with Visualization (saves predicted masks)
-
-```bash
-python test.py \
-      --dataset rrsis_d \
-      --split test \
-      --resume ./output/best_model.pth \
-      --visualize \
-      --fp16
-```
-
-### Output 
-
-```
-============================================================
-Results on rrsis_d (test)
-Caption Eval Mode: first
-============================================================
-  mIoU:  70.51%
-  oIoU:  80.24%
-  P@0.5: 82.36%
-  P@0.6: 77.10%
-  P@0.7: 66.82%
-  P@0.8: 50.59%
-  P@0.9: 31.08%
-  Samples: 3481
-  Avg Time: 268.9ms
-============================================================
-```
+#### 2. Frontend Setup (React Client)
+1. Navigate back to the webapp root:
+   ```bash
+   cd ..
+   ```
+2. Install Node packages:
+   ```bash
+   npm install
+   ```
+3. Run Development Web Server:
+   ```bash
+   npm run dev -- --port 5173
+   ```
+4. Access the web app in your browser at `http://localhost:5173`.
 
 ---
 
-## All CLI Arguments Reference
+## 🧠 Model Registry and Dynamic Auto-Sync
+
+To maintain a professional coding workflow, models are **code-driven**. Adding or updating a model:
+1. Open the model registry configuration in `RRSIS-WebApp/backend/services/model_registry.py`.
+2. Edit or add model specifications inside the `MODEL_REGISTRY` dictionary.
+3. On application startup, the backend automatically performs a database sync:
+   - Registers new models in Firestore.
+   - Syncs display names, versions, and description changes.
+   - Automatically flags database entries that do not have active backend python files with `isIntegrated: false`.
+4. User and Admin Dashboards will automatically read these values and update model counters, validation guards, and dropdown select elements dynamically.
+
+---
+
+## ⚙️ CLI Arguments Reference
 
 | Category | Argument | Default | Type | Description |
 |----------|----------|---------|------|-------------|
@@ -275,6 +345,7 @@ Caption Eval Mode: first
 | | `--no_multiscale_ot` | `False` | flag | Disable multi-scale OT |
 | | `--no_ohem_loss` | `False` | flag | Disable OHEM loss |
 | **Enhancement Params** | `--contrastive_weight` | `0.1` | float | InfoNCE loss weight |
+| | `--scl_weight` | `0.1` | float | Structural Consistency Loss weight |
 | | `--ohem_hard_ratio` | `0.3` | float | OHEM hard pixel fraction |
 | | `--ot_reg` | `0.1` | float | Sinkhorn regularization |
 | | `--ot_num_iter` | `10` | int | Sinkhorn iterations |
