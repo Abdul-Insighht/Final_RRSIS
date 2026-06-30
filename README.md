@@ -20,7 +20,7 @@ The system features complete end-to-end integration:
 
 ## Demo
 
-![Web_App RRSIS-OT Demo Video](RRSIS_Web_Demo.mp4)
+[Watch the RRSIS-OT Web App Demo Video](RRSIS_Web_Demo.mp4)
 
 ---
 
