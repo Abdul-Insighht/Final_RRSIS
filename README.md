@@ -1,7 +1,7 @@
 # Enhanced RRSIS-OT: Unified Platform for Referring Remote Sensing Image Segmentation
 
 Welcome to **Enhanced RRSIS-OT**, a complete mono-repository comprising:
-1. **The Core ML Research Pipeline (Root)**: A state-of-the-art referring remote sensing image segmentation (RRSIS) research framework extending SAM3 with 4+1 novel techniques (Dynamic LoRA, Multi-Scale OT, OHEM, Contrastive Loss, GPG, and SAP) targeting **82–83% mIoU** on the RRSIS-D dataset.
+1. **The Core ML Research Pipeline (Root)**: A state-of-the-art referring remote sensing image segmentation (RRSIS) research framework extending SAM3 with 4+1 novel techniques (Dynamic LoRA, Multi-Scale OT, OHEM, Contrastive Loss, GPG, and SAP) on the RRSIS-D and RRSIS-HR dataset.
 2. **The Web Application (`RRSIS-WebApp/`)**: An interactive, production-ready GIS platform featuring a modern **React client**, a lazy-loading **Flask inference API** hosting the trained PyTorch checkpoints, and a **Firebase Firestore backend** with user credit management, project states, and real-time dashboard notifications.
 
 ---
@@ -53,20 +53,6 @@ Image (B,3,504,504) + Caption (List[str])
 | 🟢 **Grounding-Aware Prompt Generator** | [prompt_generator.py](file:///d:/FYPPP/Final_RRSIS/lib/prompt_generator.py) | Extracts point-based geometric prompts from OT transport plans |
 | 🟢 **Scale-Aware Prompting (SAP)** | [prompt_generator.py](file:///d:/FYPPP/Final_RRSIS/lib/prompt_generator.py) | Dynamically adapts point counts based on object scale to suppress noise |
 
-### Key Differences from RRSIS_SAM3
-
-| Feature | RRSIS_SAM3 | Enhanced_RRSIS_OT |
-|---------|------------|---------------------|
-| LoRA Type | Static (same weights for all inputs) | **Dynamic** (text-conditioned per-caption) |
-| OT Alignment | Single-scale, one pass | **Multi-scale** across all FPN levels |
-| OT Numerics | FP16 (NaN risk) | **FP32-safe Sinkhorn** with autocast disabled |
-| Loss Function | Dice + BCE | **OHEM + FocalDice + Boundary + Contrastive + SCL** |
-| Score Supervision | Uniform 1/N targets | **IoU-based query matching** (best query → 1.0, others → 0.0) |
-| Contrastive Features | Pooled encoder output (no spatial info) | **FPN features** with real spatial structure |
-| Vision-Language Bond | Fusion encoder only | **Early** (LoRA) + **Mid** (OT) + **Late** (Contrastive) alignment |
-| Point Grounding | None | **GPG with Scale-Aware Prompting (SAP)** |
-
----
 
 ## 📂 Project Directory Structure
 
@@ -150,10 +136,9 @@ pip install -r requirements.txt
 |---------|-------|-----|------|------------|------------|-----------|
 | **RRSIS-D** | 12,181 | 1,740 | 3,481 | 800×800 | 20 | DIOR-RSVG |
 | **RRSIS-HR** | 2,118 | 268 | 264 | 1024×1024 | 7 | High-Res |
-| **RefSegRS** | 2,172 | 413 | 1,817 | 512×512 | — | Original RS |
 
 #### 1. Training Commands
-* **🏆 Recommended Hyperparameters (Best Performance)**:
+* ** Hyperparameters (Best Performance)**:
   ```bash
   env MPLBACKEND="agg" WANDB_MODE=disabled python train.py \
         --dataset rrsis_d \
@@ -302,51 +287,38 @@ To maintain a professional coding workflow, models are **code-driven**. Adding o
 
 ---
 
-## ⚙️ CLI Arguments Reference
+### Output 
 
-| Category | Argument | Default | Type | Description |
-|----------|----------|---------|------|-------------|
-| **Paths** | `--data_root` | `./data/` | str | Root directory of datasets |
-| | `--output_dir` | `./output/` | str | Output directory for checkpoints |
-| | `--sam3_ckpt` | `./pre-trained-weights/sam3.pt` | str | SAM3 pretrained checkpoint |
-| | `--resume` | `` | str | Resume from checkpoint |
-| **Dataset** | `--dataset` | `refcoco` | str | Dataset: `rrsis_d`, `rrsis_hr`, `refsegrs` |
-| | `--split` | `train` | str | Data split |
-| | `--max_tokens` | `32` | int | Max text token length |
-| **Model** | `--image_size` | `504` | int | Input size (divisible by 14) |
-| | `--lora_rank` | `16` | int | LoRA rank |
-| | `--lora_alpha` | `32.0` | float | LoRA alpha scaling |
-| **Enhancements** | `--use_dynamic_lora` | `True` | flag | Enable Dynamic LoRA |
-| | `--use_contrastive_loss` | `True` | flag | Enable InfoNCE loss |
-| | `--use_multiscale_ot` | `True` | flag | Enable Multi-Scale OT |
-| | `--use_ohem_loss` | `True` | flag | Enable OHEM loss |
-| | `--no_dynamic_lora` | `False` | flag | Disable Dynamic LoRA |
-| | `--no_contrastive_loss` | `False` | flag | Disable contrastive loss |
-| | `--no_multiscale_ot` | `False` | flag | Disable multi-scale OT |
-| | `--no_ohem_loss` | `False` | flag | Disable OHEM loss |
-| **Enhancement Params** | `--contrastive_weight` | `0.1` | float | InfoNCE loss weight |
-| | `--scl_weight` | `0.1` | float | Structural Consistency Loss weight |
-| | `--ohem_hard_ratio` | `0.3` | float | OHEM hard pixel fraction |
-| | `--ot_reg` | `0.1` | float | Sinkhorn regularization |
-| | `--ot_num_iter` | `10` | int | Sinkhorn iterations |
-| | `--num_ot_scales` | `3` | int | FPN scales for OT |
-| | `--boundary_loss_weight` | `0.5` | float | Boundary loss weight |
-| | `--focal_gamma` | `2.0` | float | Focal loss gamma |
-| **Training** | `--epochs` | `40` | int | Training epochs |
-| | `--batch_size` | `2` | int | Batch size per GPU |
-| | `--lr` | `5e-5` | float | Base learning rate |
-| | `--lr_backbone` | `1e-5` | float | Backbone (LoRA) LR |
-| | `--lr_decoder` | `5e-5` | float | Decoder/seg head LR |
-| | `--weight_decay` | `1e-2` | float | AdamW weight decay |
-| | `--warmup_epochs` | `5` | int | LR warmup epochs |
-| | `--grad_accum_steps` | `4` | int | Gradient accumulation |
-| **Optimization** | `--fp16` | `True` | flag | Mixed precision (FP16) |
-| | `--gradient_checkpointing` | `True` | flag | Gradient checkpointing |
-| | `--seed` | `42` | int | Random seed |
-| **Evaluation** | `--eval_only` | `False` | flag | Evaluation mode only |
-| | `--visualize` | `False` | flag | Save prediction visualizations |
+## Quantitative Results
 
----
+```
+============================================================
+Results on rrsis_d (test)
+============================================================
+  mIoU:  70.51%
+  oIoU:  80.24%
+  P@0.5: 82.36%
+  P@0.6: 77.10%
+  P@0.7: 66.82%
+  P@0.8: 50.59%
+  P@0.9: 31.08%
+  Samples: 3481
+============================================================
+
+============================================================
+Results on rrsis_hr (test)
+============================================================
+  mIoU:  53.64%
+  oIoU:  58.64%
+  P@0.5: 66.67%
+  P@0.6: 62.5%
+  P@0.7: 59.09%
+  P@0.8: 48.86%
+  P@0.9: 18.18%
+============================================================
+
+
+```
 
 ## Ablation_Study
 
