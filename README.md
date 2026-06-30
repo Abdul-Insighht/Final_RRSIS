@@ -296,6 +296,29 @@ To maintain a professional coding workflow, models are **code-driven**. Adding o
 
 ---
 
+## Qualitative Predictions & Failure Cases
+
+We present a qualitative analysis of the proposed DyMS-OT framework evaluated on the test split of the datasets. Below are representative examples of successful predictions (best cases) and failure cases.
+
+### Successful Predictions (Best Cases)
+
+* **Vehicle on the right** (TEST Sample `16_0`, IoU = 98.34%): Sharp object boundaries cleanly separated from background clutter and shadows.
+  ![Best Case 16_0](Qualitative_Result/test/16_0_combined_A_vehicle_on_the_right.png)
+* **Small bridge** (TEST Sample `34_0`, IoU = 95.35%): Fine-grained details and contours of small objects are perfectly preserved.
+  ![Best Case 34_0](Qualitative_Result/test/34_0_combined_The_small_bridge.png)
+* **Vehicle is a little smaller than the vehicle in the middle** (TEST Sample `10_0`, IoU = 68.65%): Accurately parsed comparative spatial references.
+  ![Best Case 10_0](Qualitative_Result/test/10_0_combined_The_vehicle_is_a_little_smaller_than_the.png)
+
+### Failure Cases (IoU = 0.00%)
+
+* **Airport in the middle** (TEST Sample `4_0`): Shares color/texture characteristics with surrounding clutter, leading to false positives on adjacent runways.
+  ![Failure Case 4_0](Qualitative_Result/test/4_0_combined_The_airport_in_the_middle.png)
+* **The vehicle is similar in size to the vehicle on the lower left** (TEST Sample `47_0`): Fails to resolve relative comparisons without an absolute spatial or visual anchor.
+  ![Failure Case 47_0](Qualitative_Result/test/47_0_combined_The_vehicle_is_similar_in_size_to_the_ve.png)
+* **Vehicle is on the right of the tiny expressway toll station at the bottom** (TEST Sample `14_0`): Tiny targets (<20 pixels) are lost during deep spatial downsampling under complex referencing clauses.
+  ![Failure Case 14_0](Qualitative_Result/test/14_0_combined_A_vehicle_is_on_the_right_of_the_tiny_ex.png)
+
+
 ## Ablation_Study
 
 To validate the contribution of each module in the Enhanced RRSIS-OT pipeline, we performed a module-wise ablation study on the RRSIS-D test split. The evaluation uses the clean protocol with `caption_eval_mode=first` and threshold `0.5000`. The reported metrics are `mIoU`, `oIoU`, and precision at IoU thresholds from `P@0.5` to `P@0.9`.
