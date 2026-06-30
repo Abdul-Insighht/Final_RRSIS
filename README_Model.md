@@ -254,6 +254,41 @@ We present a qualitative analysis of the proposed DyMS-OT framework evaluated on
 
 ---
 
+## Ablation_Study
+
+To validate the contribution of each module in the Enhanced RRSIS-OT pipeline, we performed a module-wise ablation study on the RRSIS-D test split. The evaluation uses the clean protocol with `caption_eval_mode=first` and threshold `0.5000`. The reported metrics are `mIoU`, `oIoU`, and precision at IoU thresholds from `P@0.5` to `P@0.9`.
+
+### Ablation Results on RRSIS-D
+
+| Case | Ablation Setting | Module Configuration | mIoU | oIoU | P@0.5 | P@0.6 | P@0.7 | P@0.8 | P@0.9 |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| A0 | `A0_sam3_only` | Baseline without Dynamic LoRA, Contrastive Loss, Multi-Scale OT, OHEM, and GPG-style prompts | 63.49 | 74.76 | 73.25 | 65.44 | 55.24 | 41.91 | 21.92 |
+| A1 | `A1_plus_dynlora` | Dynamic LoRA only | 67.91 | 78.13 | 78.51 | 71.76 | 61.45 | 48.49 | 27.26 |
+| A2 | `A2_plus_msot` | Multi-Scale OT only | 66.39 | 75.90 | 77.88 | 72.08 | 61.10 | 46.51 | 27.69 |
+| A3 | `A3_plus_msot_gpg` | Multi-Scale OT + GPG/SAP prompting | 65.88 | 76.67 | 76.90 | 71.33 | 59.95 | 45.68 | 26.98 |
+| A4 | `A4_plus_decoder_ot` | Decoder-side OT isolated case | 64.15 | 75.21 | 74.78 | 66.93 | 55.47 | 41.88 | 22.35 |
+| A5 | `A5_plus_ohem` | OHEM loss only | 64.04 | 74.61 | 74.32 | 67.37 | 56.25 | 42.43 | 20.94 |
+| A6 | `A6_plus_contrastive` | Contrastive loss only | 63.82 | 73.72 | 73.69 | 65.93 | 55.27 | 42.80 | 22.21 |
+| A7 | `A7_full` | Full model reference | 70.51 | 80.24 | 82.36 | 77.10 | 66.82 | 50.59 | 31.08 |
+| A8 | `A8_full_no_dynlora` | Full model without Dynamic LoRA | 65.81 | 76.91 | 76.85 | 70.96 | 60.27 | 45.76 | 27.09 |
+| A9 | `A9_full_no_msot` | Full model without Multi-Scale OT | 69.41 | 78.88 | 80.81 | 74.72 | 63.43 | 48.95 | 28.56 |
+| A13 | `A13_full_no_ohem` | Full model without OHEM | 70.06 | 79.73 | 81.93 | 76.39 | 65.79 | 50.62 | 30.48 |
+| A14 | `A14_full_no_contrastive` | Full model without Contrastive Loss | 68.43 | 79.23 | 79.66 | 73.83 | 63.37 | 48.43 | 28.96 |
+| A18 | `A18_Full_no_gpg_Final_RRSIS` | Strict Final_RRSIS-style full model without GPG | 69.03 | 78.35 | 80.15 | 74.26 | 64.06 | 48.87 | 29.73 |
+
+### Module Contribution from Leave-One-Out Ablations
+
+The full model (`A7_full`) achieves `70.51 mIoU` and `80.24 oIoU`. Removing each module from the full configuration gives the following drops:
+
+| Case | Removed Module | Delta mIoU | Delta oIoU | Conclusion |
+|---|---|---:|---:|---|
+| A8 | Dynamic LoRA | -4.70 | -3.33 | Dynamic LoRA is the strongest contributor and should be kept. |
+| A14 | Contrastive Loss | -2.08 | -1.01 | Contrastive supervision gives a clear performance gain. |
+| A18 | GPG/SAP Prompting | -1.48 | -1.89 | GPG contributes meaningfully to the full setup. |
+| A9 | Multi-Scale OT | -1.10 | -1.36 | Multi-scale OT improves cross-modal alignment. |
+| A13 | OHEM Loss | -0.45 | -0.51 | OHEM gives a smaller but positive gain and can be tuned further. |
+
+---
 ## All CLI Arguments Reference
 
 | Category | Argument | Default | Type | Description |
