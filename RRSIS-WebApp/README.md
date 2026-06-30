@@ -123,9 +123,19 @@ GeoSegAI/
    pip install -r requirements.txt
    ```
 
-5. Ensure your firebase credentials (`serviceAccountKey.json`) are placed inside the `backend/` root directory to authenticate transactions.
+5. **Place Model Weights**:
+   Create the weights directories and place your model checkpoints (since large binary files are excluded from Git):
+   * Create `backend/weights/cadformer/` and place the following files there:
+     - `model_best_RMSIN.pth` (2.8 GB fine-tuned CADFormer checkpoint)
+     - `swin_base_patch4_window12_384_22k.pth` (450 MB Swin Backbone checkpoint)
+   * Create `backend/weights/RS-OT-SAM3/` and place the following files there:
+     - `sam3.pt` (3.4 GB base SAM3 checkpoint)
+     - `best_model.pth` (3.7 GB fine-tuned checkpoint)
+   *(Note: Local BERT tokenizer configurations inside `backend/weights/cadformer/bert/` are already tracked in Git).*
 
-6. Run the Flask server:
+6. Ensure your firebase credentials (`serviceAccountKey.json`) are placed inside the `backend/` root directory to authenticate transactions.
+
+7. Run the Flask server:
    ```bash
    python app.py
    ```
