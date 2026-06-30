@@ -286,39 +286,13 @@ To maintain a professional coding workflow, models are **code-driven**. Adding o
 4. User and Admin Dashboards will automatically read these values and update model counters, validation guards, and dropdown select elements dynamically.
 
 ---
-### Output of RRSIS_Pipeline 
+### Quantitative Results
+## Output of RRSIS_Pipeline 
 
-**RRSIS-D (test):**
-```
-============================================================
-Results on rrsis_d (test)
-============================================================
-  mIoU:  70.51%
-  oIoU:  80.24%
-  P@0.5: 82.36%
-  P@0.6: 77.10%
-  P@0.7: 66.82%
-  P@0.8: 50.59%
-  P@0.9: 31.08%
-  Samples: 3481
-============================================================
-```
-
-**RRSIS-HR (test):**
-```
-============================================================
-Results on rrsis_hr (test)
-============================================================
-  mIoU:  53.64%
-  oIoU:  58.64%
-  P@0.5: 66.67%
-  P@0.6: 62.5%
-  P@0.7: 59.09%
-  P@0.8: 48.86%
-  P@0.9: 18.18%
-============================================================
-```
-
+| Dataset | mIoU | oIoU | P@0.5 | P@0.6 | P@0.7 | P@0.8 | P@0.9 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **RRSIS-D (test)** | 70.51% | 80.24% | 82.36% | 77.10% | 66.82% | 50.59% | 31.08% |
+| **RRSIS-HR (test)** | 53.64% | 58.64% | 66.67% | 62.50% | 59.09% | 48.86% | 18.18% |
 
 ---
 
