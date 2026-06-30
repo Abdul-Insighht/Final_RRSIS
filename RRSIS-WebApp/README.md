@@ -25,12 +25,6 @@ The system features complete end-to-end integration:
 
 ---
 
-* **Frontend**: Built with React, TailwindCSS, Vite, and the Firebase Client SDK.
-* **Backend**: Powered by Flask, executing local PyTorch inference pipelines on CPU (with optional CUDA acceleration).
-* **Database & Auth**: Google Firebase (Authentication & Firestore NoSQL) for secure user sessions, credit reservation, and project management.
-
----
-
 ## 📂 Project Directory Structure
 
 ```
