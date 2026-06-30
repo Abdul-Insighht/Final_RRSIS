@@ -7,32 +7,23 @@ The platform coordinates a multi-model architecture, integrating:
 2. **RS-OT-SAM3**: An advanced model utilizing Unbalanced Optimal Transport (UOT) coupled with a Segment Anything 3 (SAM3) backbone for high-precision boundary segmentation.
 
 ---
+## 🏛️ System Architecture
 
-## 🏛️ Application Architecture
+![Web_App RRSIS-OT Architecture](System_Architecture.png)
 
-The application is structured into three decoupled layers:
+The system features complete end-to-end integration:
+* **Frontend**: React + TailwindCSS + Vite + Firebase Client SDK.
+* **Backend**: Flask API executing local PyTorch inference pipelines on CPU or CUDA-accelerated hardware.
+* **Core Models**: CADFormer (visual-textual fusion) and RS-OT-SAM3 (Optimal Transport boundaries + Segment Anything 3).
+* **Database & Auth**: Google Firebase (Authentication & Firestore NoSQL) for secure user sessions, credit reservation, and project management.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   React Client (Vite)                   │
-│  - Modern Dashboard Page & Interactive Segmentation UI   │
-│  - Real-time Firestore SDK & Credit Management          │
-└────────────────────────────┬────────────────────────────┘
-                             │ REST / JSON API
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│                    Flask API Backend                    │
-│  - Dynamic model routing & lazy-loading registry        │
-│  - Token verification, secure file uploads, & CORS      │
-└────────────────────────────┬────────────────────────────┘
-                             │ Local PyTorch Pipeline
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Deep Learning Models                   │
-│  - CADFormer Swin-Base + BERT tokenizer                 │
-│  - RS-OT-SAM3 + SAM3 ViT Backbone + Dynamic LoRA        │
-└─────────────────────────────────────────────────────────┘
-```
+---
+
+## Demo
+
+[Watch the RRSIS-OT Web App Demo Video](RRSIS_Web_Demo.mp4)
+
+---
 
 * **Frontend**: Built with React, TailwindCSS, Vite, and the Firebase Client SDK.
 * **Backend**: Powered by Flask, executing local PyTorch inference pipelines on CPU (with optional CUDA acceleration).
