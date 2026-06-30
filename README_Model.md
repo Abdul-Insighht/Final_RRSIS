@@ -54,19 +54,6 @@ Image (B,3,504,504) + Caption (List[str])
 | Vision-Language Bond | Fusion encoder only | **Early** (LoRA) + **Mid** (OT) + **Late** (Contrastive) alignment |
 | Point Grounding | None | **GPG with Scale-Aware Prompting (SAP)** |
 
----
-
-## Bug Fixes Applied (v2)
-
-These critical bugs from v1 have been fixed in this release:
-
-| Bug | Severity | Fix |
-|-----|----------|-----|
-| **Sinkhorn FP16 underflow** → NaN crash | 🔴 Critical | Force FP32 + `autocast(enabled=False)` inside Sinkhorn |
-| **Score supervision** → all queries trained to 1/N | 🟠 High | IoU-based matching: best query → 1.0, others → 0.0 |
-| **Contrastive loss** → constant spatial map | 🟡 Medium | Use real FPN features instead of pooled+expanded |
-| **SCL weight** → hardcoded 0.1 | 🟢 Low | Configurable `scl_weight` parameter |
-| **Deprecated APIs** → PyTorch warnings | 🟢 Low | Updated `torch.amp.GradScaler` and `torch.amp.autocast` |
 
 ---
 
