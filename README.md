@@ -286,11 +286,9 @@ To maintain a professional coding workflow, models are **code-driven**. Adding o
 4. User and Admin Dashboards will automatically read these values and update model counters, validation guards, and dropdown select elements dynamically.
 
 ---
-
 ### Output 
 
-## Quantitative Results
-
+**RRSIS-D (test):**
 ```
 ============================================================
 Results on rrsis_d (test)
@@ -304,9 +302,10 @@ Results on rrsis_d (test)
   P@0.9: 31.08%
   Samples: 3481
 ============================================================
-
 ```
 
+**RRSIS-HR (test):**
+```
 ============================================================
 Results on rrsis_hr (test)
 ============================================================
@@ -318,9 +317,10 @@ Results on rrsis_hr (test)
   P@0.8: 48.86%
   P@0.9: 18.18%
 ============================================================
-
-
 ```
+
+
+---
 
 ## Ablation_Study
 
