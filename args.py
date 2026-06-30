@@ -58,6 +58,8 @@ def get_parser():
     # ====== Enhancement Parameters (NEW) ======
     parser.add_argument('--contrastive_weight', type=float, default=0.1,
                         help='Weight for contrastive loss (InfoNCE)')
+    parser.add_argument('--scl_weight', type=float, default=0.1,
+                        help='Weight for structural consistency loss (SCL)')
     parser.add_argument('--ohem_hard_ratio', type=float, default=0.3,
                         help='OHEM: fraction of hardest pixels to keep')
     parser.add_argument('--ot_reg', type=float, default=0.1,

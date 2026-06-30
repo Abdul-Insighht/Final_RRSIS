@@ -269,9 +269,9 @@ def main():
     print(f"  Device: {device}")
     print(f"  --- Enhancements ---")
     print(f"  Dynamic LoRA: {args.use_dynamic_lora}")
-    print(f"  Contrastive Loss: {args.use_contrastive_loss} (weight={args.contrastive_weight})")
+    print(f"  Contrastive Loss: {args.use_contrastive_loss} (weight={args.contrastive_weight}, SCL weight={args.scl_weight})")
     print(f"  Multi-Scale OT: {args.use_multiscale_ot} ({args.num_ot_scales} scales)")
-    print(f"  OHEM Loss: {args.use_ohem_loss} (hard_ratio={args.ohem_hard_ratio})")
+    print(f"  OHEM Loss: {args.use_ohem_loss} (hard_ratio={args.ohem_hard_ratio}, boundary_weight={args.boundary_loss_weight}, focal_gamma={args.focal_gamma})")
     print(f"{'='*60}\n")
 
     # ====== Build Enhanced Model ======
@@ -291,10 +291,13 @@ def main():
         use_ohem_loss=args.use_ohem_loss,
         # Enhancement params
         contrastive_weight=args.contrastive_weight,
+        scl_weight=args.scl_weight,
         ohem_hard_ratio=args.ohem_hard_ratio,
         ot_reg=args.ot_reg,
         ot_num_iter=args.ot_num_iter,
         num_ot_scales=args.num_ot_scales,
+        boundary_loss_weight=args.boundary_loss_weight,
+        focal_gamma=args.focal_gamma,
     )
     model = model.to(device)
 

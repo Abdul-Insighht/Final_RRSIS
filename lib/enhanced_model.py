@@ -105,6 +105,8 @@ class Enhanced_RRSIS_UOT(nn.Module):
         ot_reg: float = 0.1,
         ot_num_iter: int = 10,
         num_ot_scales: int = 3,
+        boundary_loss_weight: float = 0.5,
+        focal_gamma: float = 2.0,
     ):
         super().__init__()
         self.image_size = image_size
@@ -114,6 +116,8 @@ class Enhanced_RRSIS_UOT(nn.Module):
         self.use_ohem_loss = use_ohem_loss
         self.contrastive_weight = contrastive_weight
         self.scl_weight = scl_weight
+        self.boundary_loss_weight = boundary_loss_weight
+        self.focal_gamma = focal_gamma
 
         # ====== Build SAM3 Image Model ======
         print("[Enhanced_RRSIS_UOT] Building SAM3 image model...")
@@ -182,7 +186,11 @@ class Enhanced_RRSIS_UOT(nn.Module):
         # ====== OHEM Loss ======
         if use_ohem_loss:
             print("[Enhanced_RRSIS_UOT] OHEM + FocalDice + Boundary Loss enabled")
-            self.enhanced_loss = EnhancedOHEMLoss(hard_ratio=ohem_hard_ratio)
+            self.enhanced_loss = EnhancedOHEMLoss(
+                hard_ratio=ohem_hard_ratio,
+                boundary_weight=boundary_loss_weight,
+                focal_gamma=focal_gamma
+            )
         else:
             print("[Enhanced_RRSIS_UOT] Standard Dice+BCE Loss (baseline)")
             self.standard_loss = OTSegmentationLoss()

@@ -307,6 +307,14 @@ def main():
         use_contrastive_loss=args.use_contrastive_loss,
         use_multiscale_ot=args.use_multiscale_ot,
         use_ohem_loss=args.use_ohem_loss,
+        contrastive_weight=args.contrastive_weight,
+        scl_weight=args.scl_weight,
+        ohem_hard_ratio=args.ohem_hard_ratio,
+        ot_reg=args.ot_reg,
+        ot_num_iter=args.ot_num_iter,
+        num_ot_scales=args.num_ot_scales,
+        boundary_loss_weight=args.boundary_loss_weight,
+        focal_gamma=args.focal_gamma,
     )
 
     # Load trained weights
