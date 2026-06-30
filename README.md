@@ -8,27 +8,7 @@ Welcome to **GeoSegAI & Enhanced RRSIS-OT**, a complete mono-repository comprisi
 
 ## 🏛️ System Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   React Client (Vite)                   │
-│  - Modern Dashboard Page & Interactive Segmentation UI   │
-│  - Real-time Firestore SDK & Credit Management          │
-└────────────────────────────┬────────────────────────────┘
-                             │ REST / JSON API
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│                    Flask API Backend                    │
-│  - Dynamic model routing & lazy-loading registry        │
-│  - Token verification, secure file uploads, & CORS      │
-└────────────────────────────┬────────────────────────────┘
-                             │ Local PyTorch Pipeline
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Deep Learning Models                   │
-│  - CADFormer Swin-Base + BERT tokenizer                 │
-│  - RS-OT-SAM3 + SAM3 ViT Backbone + Dynamic LoRA        │
-└─────────────────────────────────────────────────────────┘
-```
+![Web_App RRSIS-OT Architecture](System_Architecture.png)
 
 The system features complete end-to-end integration:
 * **Frontend**: React + TailwindCSS + Vite + Firebase Client SDK.
@@ -38,7 +18,7 @@ The system features complete end-to-end integration:
 
 ---
 
-## 🧠 Deep Learning Architecture & Data Flow
+## 🧠 RRSIS_Pipeline
 
 ![Enhanced RRSIS-OT Architecture](Final_RRSIS_Architecture.jpeg)
 
