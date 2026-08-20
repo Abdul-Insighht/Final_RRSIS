@@ -1,7 +1,4 @@
-# Enhanced_RRSIS_OT: Enhanced Referring Remote Sensing Image Segmentation with Optimal Transport
-
-**Enhanced_RRSIS_OT** extends **RRSIS_SAM3** with **4+1 novel techniques** for improved performance on referring remote sensing image segmentation, on RRSIS-D and RRSIS-HR.
-
+# ROTSAM: Adapting SAM3 for Referring Remote Sensing Image Segmentation via Text-Guided Optimal Transport
 ---
 
 ## What's New (Over RRSIS_SAM3)
@@ -19,7 +16,7 @@
 
 ## Architecture
 
-![Enhanced RRSIS-OT Architecture](Final_RRSIS_Architecture.jpeg)
+![Enhanced RRSIS-OT Architecture](ROTSAM_Architecture.jpg)
 
 ### Data Flow Summary
 
