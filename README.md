@@ -28,7 +28,7 @@ https://github.com/user-attachments/assets/64ddace4-e38c-4822-b08d-b149a911f102
 
 ## ROTSAM_Pipeline
 
-![Enhanced RRSIS-OT Architecture](ROTSAM_Architecture.png)
+![Enhanced RRSIS-OT Architecture](ROTSAM_Architecture.jpg)
 
 ### Model Data Flow Summary
 
