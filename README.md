@@ -1,4 +1,4 @@
-# Enhanced RRSIS-OT: Unified Platform for Referring Remote Sensing Image Segmentation
+# ROTSAM: Adapting SAM3 for Referring Remote Sensing Image Segmentation via Text-Guided Optimal Transport
 
 Welcome to **Enhanced RRSIS-OT**, a complete mono-repository comprising:
 1. **The Core ML Research Pipeline (Root)**: A state-of-the-art referring remote sensing image segmentation (RRSIS) research framework extending SAM3 with 4+1 novel techniques (Dynamic LoRA, Multi-Scale OT, OHEM, Contrastive Loss, GPG, and SAP) on the RRSIS-D and RRSIS-HR dataset.
